@@ -84,6 +84,10 @@ cipher AES-256-CBC
 status $CNAME.status.log
 log-append $CNAME.log
 verb 4"
+    if [[ $REDIRECT_GATEWAY = yes ]]; then
+      BASE_CONF="$BASE_CONF
+redirect-gateway def1 bypass-dns"
+    fi
     BASE_KEY_EMBED="
 <ca>
 $(cat $CACRTFILE)
@@ -119,6 +123,11 @@ tls-auth [inline] 1
 key-direction 1
 $BASE_KEY_EMBED
 " > $CNAME.windows.ovpn
+    if [[ $REDIRECT_GATEWAY = yes ]]; then
+      echo >> $CNAME.windows.ovpn
+      echo route-method exe >> $CNAME.windows.ovpn
+      echo route-delay 2 >> $CNAME.windows.ovpn
+    fi
     # android client
     echo "
 $BASE_CONF
